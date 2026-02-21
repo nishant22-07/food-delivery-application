@@ -1,0 +1,14 @@
+package com.nishant.foodiesapi.IO;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+
+@Getter
+@AllArgsConstructor
+public class AuthenticationResponse {
+    private String email;
+    private String password;
+
+
+}
