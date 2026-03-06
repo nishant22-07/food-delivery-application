@@ -5,6 +5,7 @@ import com.nishant.foodiesapi.service.AppUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -38,10 +39,17 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(auth -> auth
+
+                        // Allow preflight CORS requests
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // Public APIs
                         .requestMatchers("/api/register", "/api/login").permitAll()
                         .requestMatchers("/api/foods/**").permitAll()
                         .requestMatchers("/api/orders/status/**").permitAll()
                         .requestMatchers("/api/orders/all").permitAll()
+
+                        // All other APIs require authentication
                         .anyRequest().authenticated()
                 )
 
@@ -79,7 +87,7 @@ public class SecurityConfig {
 
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of(
+        config.setAllowedOriginPatterns(List.of(
                 "https://food-delivery-application-frontend-puce.vercel.app",
                 "https://food-delivery-application-frontend-three.vercel.app",
                 "http://localhost:3000"
@@ -94,7 +102,11 @@ public class SecurityConfig {
                 "OPTIONS"
         ));
 
-        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedHeaders(List.of(
+                "Authorization",
+                "Content-Type",
+                "Cache-Control"
+        ));
 
         config.setAllowCredentials(true);
 
