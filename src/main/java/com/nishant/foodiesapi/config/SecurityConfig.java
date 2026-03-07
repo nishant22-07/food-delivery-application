@@ -17,8 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
 
@@ -40,7 +40,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/register").permitAll()
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers("/api/foods/**").permitAll()
-                        .requestMatchers("/api/foods").permitAll()
                         .requestMatchers("/api/orders/status/**").permitAll()
                         .requestMatchers("/api/orders/all").permitAll()
                         .anyRequest().authenticated()
@@ -48,7 +47,7 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .httpBasic(httpBasic -> {});
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
@@ -58,30 +57,42 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-
-
+    // ⭐ IMPORTANT: Spring Security will automatically use this
     @Bean
-    public CorsFilter corsFilter() {
-        return new CorsFilter(corsConfigurationSource());
-    }
+    public CorsConfigurationSource corsConfigurationSource() {
 
-    private UrlBasedCorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("https://food-delivery-application-frontend-two.vercel.app","https://food-delivery-application-frontend-seven.vercel.app","http://localhost:3000"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+
+        config.setAllowedOrigins(List.of(
+                "https://food-delivery-application-frontend-two.vercel.app",
+                "https://food-delivery-application-frontend-seven.vercel.app",
+                "http://localhost:3000"
+        ));
+
+        config.setAllowedMethods(List.of(
+                "GET","POST","PUT","DELETE","PATCH","OPTIONS"
+        ));
+
+        config.setAllowedHeaders(List.of(
+                "Authorization","Content-Type"
+        ));
+
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
+
         return source;
     }
 
     @Bean
     public AuthenticationManager authenticationManager() {
+
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
-        return  new ProviderManager(authProvider);
+
+        return new ProviderManager(authProvider);
     }
 }
