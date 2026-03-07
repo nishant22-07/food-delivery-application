@@ -74,9 +74,7 @@ public class SecurityConfig {
                 "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
         ));
 
-        config.setAllowedHeaders(List.of(
-                "Authorization", "Content-Type"
-        ));
+        config.setAllowedHeaders(List.of("*")); // ✅ Changed this line
 
         config.setAllowCredentials(true);
 
