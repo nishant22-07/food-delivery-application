@@ -5,6 +5,7 @@ import com.nishant.foodiesapi.service.AppUserDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -37,6 +38,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ✅ Allow all preflight requests
                         .requestMatchers("/api/register").permitAll()
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers("/api/foods/**").permitAll()
@@ -57,7 +59,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // ⭐ IMPORTANT: Spring Security will automatically use this
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
@@ -70,11 +71,11 @@ public class SecurityConfig {
         ));
 
         config.setAllowedMethods(List.of(
-                "GET","POST","PUT","DELETE","PATCH","OPTIONS"
+                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
         ));
 
         config.setAllowedHeaders(List.of(
-                "Authorization","Content-Type"
+                "Authorization", "Content-Type"
         ));
 
         config.setAllowCredentials(true);
