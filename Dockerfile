@@ -33,4 +33,4 @@ COPY --from=builder /app/target/*.jar app.jar
 # Render injects PORT at runtime; Spring Boot reads it automatically
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "java -jar app.jar --server.port=${PORT:-8080}"]
